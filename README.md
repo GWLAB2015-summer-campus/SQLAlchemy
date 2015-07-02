@@ -1,11 +1,11 @@
 # Python에서 SQLAlchemy 사용하기
 
-## 구현 환경
+## 1. 구현 환경
 * Python : 2.7.3
 * SQLAlchemy : 1.0.6
 * MySQL 5.6.25
 
-## 파일 설명
+## 2. 파일 설명
 * database.py : MySQL Server와 연결을 생성하고 SQLAlchemy를 사용하기 위한 Session을 생성하는 파일
 
 * models.py : RDBMS의 테이블의 각 속성들을 매핑할 예제 클래스가 선언된 파일
@@ -14,8 +14,8 @@
 
 * main.py : 테스트 케이스
 
-## 쿼리 종류 및 구현
-#### Insert
+## 3. 쿼리 종류 및 구현
+#### 3.1 Insert
 ```
 session.add('추가할 객체 이름')
 session.commit()
@@ -26,7 +26,7 @@ ex) User를 DB에 추가
 	session.commit()
 ```
 
-#### Delete
+#### 3.2 Delete
 ```
 session.query('삭제할 객체 타입').filter_by('삭제할 객체 정보')
 session.commit()
@@ -36,7 +36,7 @@ ex) 입력한 name, fullname, password가 모두 일치하는 User 삭제
     session.commit()
 ```
 
-####  Update
+####  3.3 Update
 ```
 session.query('수정할 객체 타입').filter_by('수정할 객체 정보').update('수정 사항')
 session.commit()
@@ -46,7 +46,7 @@ ex) 입력한 name, fullname, password가 모두 일치하는 User의 정보 수
     session.commit()
 ```
 
-#### Select
+#### 3.4 Select
 ```
 Obj = session.query('검색할 객체 타입').filter_by('검색 옵션')
 
@@ -55,7 +55,7 @@ ex) 입력한 name, fullname, password가 모두 일치하는 User 검색
     print tmpUser
 ```
 
-## 관계(Relationship) 만들기
+## 4. 관계(Relationship) 만들기
 ```
 예제 코드에 Address 객체를 추가하고 User 객체를 아래와 같이 수정한다.
 
@@ -84,7 +84,7 @@ class Address(Base):
 ```
 * Foreign Key를 추가하여 Address 테이블과 User 테이블의 관계를 설정한다.
 
-### lazy loading relationship과 Eager loading relationship
+### 4.1 lazy loading relationship과 Eager loading relationship
 * lazy loading
 
 위의 User, Address 예시에서 Relationship을 설정하고 객체를 데이터베이스에 저장한 후에, 다시 해당 객체를 쿼리해서 불러올 경우 User 데이터는 가져와지지만 주소들은 SQL을 호출하지 않은 상태이다.
@@ -137,7 +137,7 @@ tmpAddress = session.query(Address).join(Address.user).filter(User.name=='aaa').
 ```
 
 
-## JOIN 사용하기
+## 5. JOIN 사용하기
 * 단순히 완전 조인을 사용한다면 filter() 메소드를 이용해 Join할 수 있다.
 
 ```
@@ -157,7 +157,7 @@ session.query(User).join(Address).filter(Address.email_address=='aaa@gmail.com')
 seession.query.outerjoin(User.addresses)	# left outer join
 ```
 
-## 서브쿼리 사용하기
+## 6. 서브쿼리 사용하기
 ```
 subq = session.query(Address.user_id, func.count('*').label('address_count')).group_by(Address.user_id).subquery()
 ```
