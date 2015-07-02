@@ -20,7 +20,7 @@ class User(Base):
         self.fullname = fullname
         self.password = password
     def __repr__(self):
-        return "<user('%s', '%s', '%s')>" %(self.name, self.fullname, password)
+        return "<user('%s', '%s', '%s')>" %(self.name, self.fullname, self.password)
 
 class Address(Base):
     __tablename__ = 'addresses'

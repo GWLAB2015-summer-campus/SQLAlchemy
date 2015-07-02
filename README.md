@@ -1,4 +1,4 @@
-# Python에서 SQLAlchemy 사용 예시
+# Python에서 SQLAlchemy 사용하기
 
 ## 구현 환경
 * Python : 2.7.3
@@ -85,6 +85,28 @@ class Address(Base):
 * Foreign Key를 추가하여 Address 테이블과 User 테이블의 관계를 설정한다.
 
 ## JOIN 사용하기
+* 단순히 완전 조인을 사용한다면 filter() 메소드를 이용해 Join할 수 있다.
 
+```
+session.query(User, Address).filter(User.id == Address.user_id).filter(Address.email_address == 'aaa@gmail.com').all()
+```
+
+* 실제 SQL에서 사용하는 Join 문법을 사용하려면 Query.join() 메소드를 사용한다.
+
+```
+session.query(User).join(Address).filter(Address.email_address=='aaa@gmail.com').all()
+```
+이 때 User와 Address 사이에 있는 하나의 외래키를 기준으로 join한다.
+
+* 외부 join은 outerjoin() 메소드를 사용한다.
+
+```
+seession.query.outerjoin(User.addresses)	# left outer join
+```
 
 ## 서브쿼리 사용하기
+```
+subq = session.query(Address.user_id, func.count('*').label('address_count')).group_by(Address.user_id).subquery()
+```
+
+* 위의 코드를 보면 서브 쿼리로 사용할 쿼리를 작성한 후 .subquery() 메소드를 사용하는데, subquery() 메소드는 별칭을 이용해 다른 query에 포함할 수 있는 SELECT 명령문의 형태로 쿼리를 반환해준다.

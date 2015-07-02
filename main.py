@@ -7,6 +7,7 @@ from database import init_db
 from database import db_session
 from models import User, Address
 import query
+from sqlalchemy.sql import func
 
 def main():
     # insert User
@@ -36,7 +37,7 @@ def main():
     query.updateUser(user1, updateuser)
     query.show_tables()
 
-    # Usage relationship
+    # Relationship
     print 'Relationship Example\n'
     print "Create tmpUser('aaa', 'bbb aaa', '12345678')\n"
     tmpUser = User('aaa', 'bbb aaa', '12345678')
@@ -52,6 +53,20 @@ def main():
 
     print 'Select tmpUser'
     query.selectUser(tmpUser)
+
+    # Join
+    joinUser1 = db_session.query(User, Address).filter(User.id == Address.user_id).filter(Address.email_address == 'aaa@gmail.com').all()
+    print joinUser1
+    
+    print 'SQL JOIN'
+    joinUser2 = db_session.query(User).join(Address).filter(Address.email_address=='aaa@gmail.com').all()
+    print joinUser2
+
+    # Sub Query
+    stmt = db_session.query(Address.user_id, func.count('*').label('address_count')).group_by(Address.user_id).subquery()
+    
+    for u, count in db_session.query(User, stmt.c.address_count).outerjoin(stmt, User.id==stmt.c.user_id).order_by(User.id):
+        print u, count
 
 if __name__=="__main__":
     main()
