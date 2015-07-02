@@ -163,3 +163,18 @@ subq = session.query(Address.user_id, func.count('*').label('address_count')).gr
 ```
 
 * 위의 코드를 보면 서브 쿼리로 사용할 쿼리를 작성한 후 .subquery() 메소드를 사용하는데, subquery() 메소드는 별칭을 이용해 다른 query에 포함할 수 있는 SELECT 명령문의 형태로 쿼리를 반환해준다.
+
+## 7. Multiple Session 사용하기
+* 한개 이상의 DB에 접속하기 위해 여러 개의 Session이 필요한 경우 다음과 같이 Session을 생성하면 된다.
+
+```
+engines = []
+sessions = []
+
+for dbconninfo in databases:
+	engine = create_engine(dbconninfo)
+    engines.append(engine)
+    sessions.append(sessionmaker(bind=engine)())
+
+```
+이렇게 배열 형태로 engine과 session을 생성하면 여러 개의 DB에 연결하여 사용할 수 있게 된다.
