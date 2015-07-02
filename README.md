@@ -84,6 +84,59 @@ class Address(Base):
 ```
 * Foreign Key를 추가하여 Address 테이블과 User 테이블의 관계를 설정한다.
 
+### lazy loading relationship과 Eager loading relationship
+* lazy loading
+
+위의 User, Address 예시에서 Relationship을 설정하고 객체를 데이터베이스에 저장한 후에, 다시 해당 객체를 쿼리해서 불러올 경우 User 데이터는 가져와지지만 주소들은 SQL을 호출하지 않은 상태이다.
+
+```
+Obj = session.query(User).filter_by(name='aaa').one()
+
+aaa	# <User('aaa', 'aaa bbb', '123456')>
+```
+
+여기서 addresses 컬랙션을 호출하는 순간 SQL이 만들어진다.
+
+```
+aaa.addresses
+# [<Address(email_address='aaa@gmail.com')>]
+```
+
+이렇게 뒤늦게 SQL로 데이터를 불러오는 관계를 lazy loading relationship이라고 한다.
+
+* Eager loading(선행 로딩) : lazt loading의 반대 개념으로 관계를 맺은 테이블을 호출할 때 바로 불러오도록 하는 방법이다. SQLAlchemy에서는 3가지 타입의 Eager loading을 사용할 수 있다.
+
+1) Subquery Load
+
+선행 로딩 하도록 표기하는 방법이다. orm.subqueryload() 메소드를 이용해서 서브쿼리를 불러올 때 한번에 연계해 데이터를 불러오도록 처리한다.
+
+```
+from sqlalchemy.orm import subqueryload
+
+obj = session.query(User).options(subqueryload(User.addresses)).filter_by(name=='aaa').one()
+```
+
+2) Joined Load
+
+또 다른 방법으로는 orm.joinedload() 메소드를 사용할 수 있다. join할 때 사용할 수 있는 방법으로 관계된 객체나 컬렉션을 한번에 불러올 수 있다.
+
+```
+from sqlalchemy.orm import joinedload
+
+obj = session.query(User).options(joinedload(User.addresses)).filter_by(name=='aaa').one()
+```
+
+3) 명시적 Join + 선행 로딩
+
+명시적 join이 primary 행에 위치했을 때 추가적인 테이블에 관계된 객체나 컬렉션을 불러온다.
+
+```
+from sqlalchemy.orm import contains_eager
+
+tmpAddress = session.query(Address).join(Address.user).filter(User.name=='aaa').options(contains_eager(Address.user)).all()
+```
+
+
 ## JOIN 사용하기
 * 단순히 완전 조인을 사용한다면 filter() 메소드를 이용해 Join할 수 있다.
 

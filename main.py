@@ -68,5 +68,8 @@ def main():
     for u, count in db_session.query(User, stmt.c.address_count).outerjoin(stmt, User.id==stmt.c.user_id).order_by(User.id):
         print u, count
 
+    # Session Close
+    db_session.close()
+
 if __name__=="__main__":
     main()
